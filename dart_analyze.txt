@@ -1,0 +1,37 @@
+﻿dart : Cannot negate 
+option "--no-fatal-infos".
+At line:1 char:1
++ dart analyze 
+--no-fatal-warnings 
+--no-fatal-infos 2>&1 | 
+ForEach-Obje ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~
+    + CategoryInfo        
+      : NotSpecified: (C  
+  annot negate option "   
+ --no-fatal-infos".:St    
+ring) [], RemoteExcep    
+tion
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+
+Usage: dart analyze 
+[arguments] [<directory>]
+-h, --help                
+   Print this usage 
+information.
+    --fatal-infos         
+   Treat info level 
+issues as fatal.
+    --[no-]fatal-warnings 
+   Treat warning level 
+issues as fatal.
+                          
+   (defaults to on)
+
+Run "dart help" to see 
+global options.

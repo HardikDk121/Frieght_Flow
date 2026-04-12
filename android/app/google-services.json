@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "450918988769",
+    "project_id": "freightflow-6ccc9",
+    "storage_bucket": "freightflow-6ccc9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:450918988769:android:f40332389cb0de2cf1f0a0",
+        "android_client_info": {
+          "package_name": "com.example.freight_flow"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_B9eHjlZ12mUqXXFavU5lRhpuHGXDVvE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
