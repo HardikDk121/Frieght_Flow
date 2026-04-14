@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
-import '../theme/app_colors.dart';
 
 /// A single shimmer "bone" block — use to build skeleton screens.
 class ShimmerBox extends StatelessWidget {
@@ -51,11 +50,26 @@ class ShimmerStatCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(height: 12, width: 60, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6))),
+            Container(
+                height: 12,
+                width: 60,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(6))),
             const SizedBox(height: 10),
-            Container(height: 28, width: 40, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6))),
+            Container(
+                height: 28,
+                width: 40,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(6))),
             const SizedBox(height: 6),
-            Container(height: 10, width: 80, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5))),
+            Container(
+                height: 10,
+                width: 80,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5))),
           ],
         ),
       ),
@@ -81,17 +95,43 @@ class ShimmerListCard extends StatelessWidget {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Container(height: 12, width: 100, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6))),
-              const SizedBox(height: 8),
-              Container(height: 14, width: 160, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6))),
-            ])),
-            Container(height: 24, width: 72, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12))),
+            Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                  Container(
+                      height: 12,
+                      width: 100,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(6))),
+                  const SizedBox(height: 8),
+                  Container(
+                      height: 14,
+                      width: 160,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(6))),
+                ])),
+            Container(
+                height: 24,
+                width: 72,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12))),
           ]),
           const SizedBox(height: 16),
-          Container(height: 10, width: double.infinity, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5))),
+          Container(
+              height: 10,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(5))),
           const SizedBox(height: 6),
-          Container(height: 10, width: 200, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5))),
+          Container(
+              height: 10,
+              width: 200,
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(5))),
         ]),
       ),
     );
@@ -121,10 +161,12 @@ class ShimmerDashboard extends StatelessWidget {
         // Section label
         const ShimmerBox(height: 14, width: 120),
         const SizedBox(height: 12),
-        ...List.generate(3, (_) => const Padding(
-          padding: EdgeInsets.only(bottom: 12),
-          child: ShimmerListCard(),
-        )),
+        ...List.generate(
+            3,
+            (_) => const Padding(
+                  padding: EdgeInsets.only(bottom: 12),
+                  child: ShimmerListCard(),
+                )),
       ]),
     );
   }
@@ -184,14 +226,36 @@ class ShimmerMasterRow extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(children: [
-          Container(height: 40, width: 40, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle)),
+          Container(
+              height: 40,
+              width: 40,
+              decoration: const BoxDecoration(
+                  color: Colors.white, shape: BoxShape.circle)),
           const SizedBox(width: 12),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Container(height: 13, width: 120, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6))),
-            const SizedBox(height: 7),
-            Container(height: 11, width: 180, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5))),
-          ])),
-          Container(height: 28, width: 60, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14))),
+          Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                Container(
+                    height: 13,
+                    width: 120,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(6))),
+                const SizedBox(height: 7),
+                Container(
+                    height: 11,
+                    width: 180,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(5))),
+              ])),
+          Container(
+              height: 28,
+              width: 60,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14))),
         ]),
       ),
     );

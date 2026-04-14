@@ -9,8 +9,6 @@ import '../../../providers/auth_provider.dart';
 import '../../../providers/bilty_provider.dart';
 import '../../../providers/challan_provider.dart';
 import '../../../providers/master_data_provider.dart';
-import '../../../core/widgets/empty_state.dart';
-import '../../../core/widgets/shimmer_loader.dart';
 
 // ── Create Challan Screen ─────────────────────────────────────────────────────
 
@@ -51,7 +49,8 @@ class _NewChallanScreenState extends State<NewChallanScreen> {
   String get _capacityHint {
     if (_selectedTruck == null) return 'Select a truck first';
     final pct = (_capacityPercent * 100).toStringAsFixed(1);
-    final needed = (_selectedTruck!.capacityKg * _minCapacityPercent / 1000).toStringAsFixed(1);
+    final needed = (_selectedTruck!.capacityKg * _minCapacityPercent / 1000)
+        .toStringAsFixed(1);
     if (_capacityPercent < _minCapacityPercent) {
       return '$pct% filled — need ≥90% (${needed}T) to dispatch';
     }
@@ -59,7 +58,7 @@ class _NewChallanScreenState extends State<NewChallanScreen> {
   }
 
   Color get _capacityColor {
-    if (_capacityPercent < 0.5)  return AppColors.danger;
+    if (_capacityPercent < 0.5) return AppColors.danger;
     if (_capacityPercent < 0.90) return AppColors.warning;
     return AppColors.success;
   }
@@ -67,35 +66,49 @@ class _NewChallanScreenState extends State<NewChallanScreen> {
   @override
   Widget build(BuildContext context) {
     final pending = _getPendingBilties(context);
-    final trucks  = context.watch<MasterDataProvider>().availableTrucks;
+    final trucks = context.watch<MasterDataProvider>().availableTrucks;
 
     return Scaffold(
       backgroundColor: AppColors.surface,
-      appBar: const FreightAppBar(title: 'New Challan', subtitle: 'Group bilties into a freight manifest'),
+      appBar: const FreightAppBar(
+          title: 'New Challan',
+          subtitle: 'Group bilties into a freight manifest'),
       body: Column(children: [
         Expanded(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               // ── Step 1: Select Truck ──────────────────────────────────────
-              _StepHeader(step: '1', title: 'Select Truck', subtitle: 'Pick an available vehicle'),
+              const _StepHeader(
+                  step: '1',
+                  title: 'Select Truck',
+                  subtitle: 'Pick an available vehicle'),
               const SizedBox(height: 12),
 
               trucks.isEmpty
-                  ? _noItemsBanner('No available trucks. Add trucks in Master Data.')
-                  : Column(children: trucks.map((t) => _TruckTile(
-                      truck: t,
-                      isSelected: _selectedTruck?.id == t.id,
-                      onTap: () => setState(() {
-                        _selectedTruck = _selectedTruck?.id == t.id ? null : t;
-                        _selectedBiltyIds.clear(); // reset bilty selection on truck change
-                      }),
-                    )).toList()),
+                  ? _noItemsBanner(
+                      'No available trucks. Add trucks in Master Data.')
+                  : Column(
+                      children: trucks
+                          .map((t) => _TruckTile(
+                                truck: t,
+                                isSelected: _selectedTruck?.id == t.id,
+                                onTap: () => setState(() {
+                                  _selectedTruck =
+                                      _selectedTruck?.id == t.id ? null : t;
+                                  _selectedBiltyIds
+                                      .clear(); // reset bilty selection on truck change
+                                }),
+                              ))
+                          .toList()),
 
               // ── Step 2: Select Bilties ────────────────────────────────────
               const SizedBox(height: 20),
-              _StepHeader(step: '2', title: 'Select Bilties', subtitle: 'Choose pending consignments to load'),
+              const _StepHeader(
+                  step: '2',
+                  title: 'Select Bilties',
+                  subtitle: 'Choose pending consignments to load'),
               const SizedBox(height: 12),
 
               if (_selectedTruck == null)
@@ -103,12 +116,14 @@ class _NewChallanScreenState extends State<NewChallanScreen> {
               else if (pending.isEmpty)
                 _noItemsBanner('No pending bilties. Create a Bilty first.')
               else
-                Column(children: pending.map((b) {
+                Column(
+                    children: pending.map((b) {
                   final isSelected = _selectedBiltyIds.contains(b.id);
                   // Hard cap: would adding this bilty exceed 100% capacity?
                   final wouldExceed = !isSelected &&
                       _selectedTruck != null &&
-                      (_totalSelectedWeight + b.weightKg) > _selectedTruck!.capacityKg;
+                      (_totalSelectedWeight + b.weightKg) >
+                          _selectedTruck!.capacityKg;
 
                   return _BiltySelectionTile(
                     bilty: b,
@@ -158,33 +173,40 @@ class _NewChallanScreenState extends State<NewChallanScreen> {
 
       // ── Bottom action bar ─────────────────────────────────────────────────
       bottomNavigationBar: _BottomActionBar(
-        selectedCount:  _selectedBiltyIds.length,
-        totalWeight:    _totalSelectedWeight,
-        canCreate:      _canCreate,
-        capacityPercent:_capacityPercent,
-        onCreateTap:    _canCreate ? () => _createChallan(context) : () => _showBlockedReason(context),
+        selectedCount: _selectedBiltyIds.length,
+        totalWeight: _totalSelectedWeight,
+        canCreate: _canCreate,
+        capacityPercent: _capacityPercent,
+        onCreateTap: _canCreate
+            ? () => _createChallan(context)
+            : () => _showBlockedReason(context),
       ),
     );
   }
 
   Future<void> _createChallan(BuildContext context) async {
-    final cp     = context.read<ChallanProvider>();
-    cp.setRouteFilter(_selectedTruck!.id); // use truck id as proxy — replaced by route
-    for (final id in _selectedBiltyIds) { cp.toggleBiltySelection(id); }
+    final cp = context.read<ChallanProvider>();
+    cp.setRouteFilter(
+        _selectedTruck!.id); // use truck id as proxy — replaced by route
+    for (final id in _selectedBiltyIds) {
+      cp.toggleBiltySelection(id);
+    }
 
     // Find the route from first bilty
-    final firstBilty = context.read<BiltyProvider>().getBiltyById(_selectedBiltyIds.first);
+    final firstBilty =
+        context.read<BiltyProvider>().getBiltyById(_selectedBiltyIds.first);
     if (firstBilty == null) return;
 
     final userId = context.read<AuthProvider>().userId;
 
     // Manually build the challan call with truck info
-    final challan = await context.read<ChallanProvider>().createChallanWithTruck(
-      biltyIds:  _selectedBiltyIds.toList(),
-      routeId:   firstBilty.routeId,
-      truckId:   _selectedTruck!.id,
-      createdBy: userId,
-    );
+    final challan =
+        await context.read<ChallanProvider>().createChallanWithTruck(
+              biltyIds: _selectedBiltyIds.toList(),
+              routeId: firstBilty.routeId,
+              truckId: _selectedTruck!.id,
+              createdBy: userId,
+            );
 
     if (!mounted) return;
     if (challan != null) {
@@ -209,9 +231,11 @@ class _NewChallanScreenState extends State<NewChallanScreen> {
     } else if (_selectedBiltyIds.isEmpty) {
       msg = 'Please select at least one bilty.';
     } else {
-      final needed   = (_selectedTruck!.capacityKg * _minCapacityPercent / 1000).toStringAsFixed(2);
-      final current  = (_totalSelectedWeight / 1000).toStringAsFixed(2);
-      msg = '90% Rule: Truck must be at least 90% loaded.\n\nRequired: ${needed}T  |  Current: ${current}T\n\nAdd more bilties to meet the minimum load requirement.';
+      final needed = (_selectedTruck!.capacityKg * _minCapacityPercent / 1000)
+          .toStringAsFixed(2);
+      final current = (_totalSelectedWeight / 1000).toStringAsFixed(2);
+      msg =
+          '90% Rule: Truck must be at least 90% loaded.\n\nRequired: ${needed}T  |  Current: ${current}T\n\nAdd more bilties to meet the minimum load requirement.';
     }
     showDialog(
       context: context,
@@ -223,52 +247,78 @@ class _NewChallanScreenState extends State<NewChallanScreen> {
         ]),
         content: Text(msg),
         actions: [
-          ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('Got it')),
+          ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Got it')),
         ],
       ),
     );
   }
 
   Widget _infoHint(String msg) => Container(
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(color: AppColors.infoLight, borderRadius: BorderRadius.circular(12)),
-    child: Row(children: [
-      const Icon(Icons.info_outline_rounded, color: AppColors.info, size: 18),
-      const SizedBox(width: 8),
-      Expanded(child: Text(msg, style: const TextStyle(fontSize: 13, color: AppColors.info))),
-    ]),
-  );
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+            color: AppColors.infoLight,
+            borderRadius: BorderRadius.circular(12)),
+        child: Row(children: [
+          const Icon(Icons.info_outline_rounded,
+              color: AppColors.info, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+              child: Text(msg,
+                  style: const TextStyle(fontSize: 13, color: AppColors.info))),
+        ]),
+      );
 
   Widget _noItemsBanner(String msg) => Container(
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(color: AppColors.warningLight, borderRadius: BorderRadius.circular(12)),
-    child: Row(children: [
-      const Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: 18),
-      const SizedBox(width: 8),
-      Expanded(child: Text(msg, style: const TextStyle(fontSize: 13, color: AppColors.warning))),
-    ]),
-  );
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+            color: AppColors.warningLight,
+            borderRadius: BorderRadius.circular(12)),
+        child: Row(children: [
+          const Icon(Icons.warning_amber_rounded,
+              color: AppColors.warning, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+              child: Text(msg,
+                  style:
+                      const TextStyle(fontSize: 13, color: AppColors.warning))),
+        ]),
+      );
 }
 
 // ── Step header ───────────────────────────────────────────────────────────────
 
 class _StepHeader extends StatelessWidget {
   final String step, title, subtitle;
-  const _StepHeader({required this.step, required this.title, required this.subtitle});
+  const _StepHeader(
+      {required this.step, required this.title, required this.subtitle});
 
   @override
   Widget build(BuildContext context) {
     return Row(children: [
       Container(
-        width: 28, height: 28,
-        decoration: BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
-        child: Center(child: Text(step,
-            style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700))),
+        width: 28,
+        height: 28,
+        decoration: const BoxDecoration(
+            color: AppColors.primary, shape: BoxShape.circle),
+        child: Center(
+            child: Text(step,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700))),
       ),
       const SizedBox(width: 10),
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-        Text(subtitle, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+        Text(title,
+            style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary)),
+        Text(subtitle,
+            style:
+                const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
       ]),
     ]);
   }
@@ -280,7 +330,8 @@ class _TruckTile extends StatelessWidget {
   final Truck truck;
   final bool isSelected;
   final VoidCallback onTap;
-  const _TruckTile({required this.truck, required this.isSelected, required this.onTap});
+  const _TruckTile(
+      {required this.truck, required this.isSelected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -291,7 +342,9 @@ class _TruckTile extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.06) : AppColors.cardBg,
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.06)
+              : AppColors.cardBg,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.divider,
@@ -300,38 +353,59 @@ class _TruckTile extends StatelessWidget {
         ),
         child: Row(children: [
           Container(
-            width: 44, height: 44,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              color: isSelected ? AppColors.primary.withValues(alpha: 0.12) : AppColors.surface,
+              color: isSelected
+                  ? AppColors.primary.withValues(alpha: 0.12)
+                  : AppColors.surface,
               borderRadius: BorderRadius.circular(12),
             ),
             padding: const EdgeInsets.all(9),
             child: Image.asset('assets/delivery.png', fit: BoxFit.contain),
           ),
           const SizedBox(width: 12),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(truck.vehicleNo,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700,
-                    color: isSelected ? AppColors.primary : AppColors.textPrimary)),
-            Text('${truck.make} ${truck.model}',
-                style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-          ])),
+          Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                Text(truck.vehicleNo,
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.textPrimary)),
+                Text('${truck.make} ${truck.model}',
+                    style: const TextStyle(
+                        fontSize: 12, color: AppColors.textSecondary)),
+              ])),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Text(CurrencyFormatter.formatWeight(truck.capacityKg),
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700,
-                    color: isSelected ? AppColors.primary : AppColors.textPrimary)),
-            const Text('Capacity', style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: isSelected
+                        ? AppColors.primary
+                        : AppColors.textPrimary)),
+            const Text('Capacity',
+                style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
           ]),
           const SizedBox(width: 8),
           AnimatedContainer(
             duration: const Duration(milliseconds: 150),
-            width: 22, height: 22,
+            width: 22,
+            height: 22,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isSelected ? AppColors.primary : Colors.transparent,
-              border: Border.all(color: isSelected ? AppColors.primary : AppColors.divider, width: 1.5),
+              border: Border.all(
+                  color: isSelected ? AppColors.primary : AppColors.divider,
+                  width: 1.5),
             ),
-            child: isSelected ? const Icon(Icons.check, size: 13, color: Colors.white) : null,
+            child: isSelected
+                ? const Icon(Icons.check, size: 13, color: Colors.white)
+                : null,
           ),
         ]),
       ),
@@ -347,8 +421,10 @@ class _BiltySelectionTile extends StatelessWidget {
   final bool isDisabled;
   final VoidCallback onTap;
   const _BiltySelectionTile({
-    required this.bilty, required this.isSelected,
-    required this.onTap, this.isDisabled = false,
+    required this.bilty,
+    required this.isSelected,
+    required this.onTap,
+    this.isDisabled = false,
   });
 
   @override
@@ -362,61 +438,89 @@ class _BiltySelectionTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDisabled
               ? AppColors.surface
-              : isSelected ? AppColors.success.withValues(alpha: 0.06) : AppColors.cardBg,
+              : isSelected
+                  ? AppColors.success.withValues(alpha: 0.06)
+                  : AppColors.cardBg,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isDisabled
                 ? AppColors.divider
-                : isSelected ? AppColors.success : AppColors.divider,
+                : isSelected
+                    ? AppColors.success
+                    : AppColors.divider,
             width: isSelected ? 1.5 : 1,
           ),
         ),
         child: Row(children: [
           AnimatedContainer(
             duration: const Duration(milliseconds: 150),
-            width: 24, height: 24,
+            width: 24,
+            height: 24,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isDisabled
                   ? AppColors.divider
-                  : isSelected ? AppColors.success : Colors.transparent,
+                  : isSelected
+                      ? AppColors.success
+                      : Colors.transparent,
               border: Border.all(
-                color: isDisabled ? AppColors.divider
-                    : isSelected ? AppColors.success : AppColors.divider,
+                color: isDisabled
+                    ? AppColors.divider
+                    : isSelected
+                        ? AppColors.success
+                        : AppColors.divider,
                 width: 1.5,
               ),
             ),
             child: isDisabled
                 ? const Icon(Icons.block, size: 12, color: AppColors.textMuted)
-                : isSelected ? const Icon(Icons.check, size: 14, color: Colors.white) : null,
+                : isSelected
+                    ? const Icon(Icons.check, size: 14, color: Colors.white)
+                    : null,
           ),
           const SizedBox(width: 10),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(bilty.biltyNo,
-                style: TextStyle(
-                  fontSize: 12, fontWeight: FontWeight.w700,
-                  color: isDisabled ? AppColors.textMuted
-                      : isSelected ? AppColors.success : AppColors.primary,
-                )),
-            Text('${bilty.consignorName} → ${bilty.consigneeCity}',
-                style: TextStyle(fontSize: 11,
-                    color: isDisabled ? AppColors.textMuted : AppColors.textSecondary),
-                overflow: TextOverflow.ellipsis),
-            if (isDisabled)
-              Text('Exceeds truck capacity',
-                  style: const TextStyle(fontSize: 10, color: AppColors.danger,
-                      fontWeight: FontWeight.w500)),
-          ])),
+          Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                Text(bilty.biltyNo,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: isDisabled
+                          ? AppColors.textMuted
+                          : isSelected
+                              ? AppColors.success
+                              : AppColors.primary,
+                    )),
+                Text('${bilty.consignorName} → ${bilty.consigneeCity}',
+                    style: TextStyle(
+                        fontSize: 11,
+                        color: isDisabled
+                            ? AppColors.textMuted
+                            : AppColors.textSecondary),
+                    overflow: TextOverflow.ellipsis),
+                if (isDisabled)
+                  const Text('Exceeds truck capacity',
+                      style: TextStyle(
+                          fontSize: 10,
+                          color: AppColors.danger,
+                          fontWeight: FontWeight.w500)),
+              ])),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Text(CurrencyFormatter.formatWeight(bilty.weightKg),
                 style: TextStyle(
-                  fontSize: 12, fontWeight: FontWeight.w600,
-                  color: isDisabled ? AppColors.textMuted : AppColors.textPrimary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color:
+                      isDisabled ? AppColors.textMuted : AppColors.textPrimary,
                 )),
             Text(CurrencyFormatter.format(bilty.totalFreight),
                 style: TextStyle(
                   fontSize: 11,
-                  color: isDisabled ? AppColors.textMuted : AppColors.textSecondary,
+                  color: isDisabled
+                      ? AppColors.textMuted
+                      : AppColors.textSecondary,
                 )),
           ]),
         ]),
@@ -434,8 +538,11 @@ class _CapacityMeter extends StatelessWidget {
   final String hint;
   final Color color;
   const _CapacityMeter({
-    required this.current, required this.capacity,
-    required this.percent, required this.hint, required this.color,
+    required this.current,
+    required this.capacity,
+    required this.percent,
+    required this.hint,
+    required this.color,
   });
 
   @override
@@ -457,13 +564,18 @@ class _CapacityMeter extends StatelessWidget {
               percent >= 0.9
                   ? Icons.check_circle_outline
                   : Icons.info_outline_rounded,
-              color: color, size: 18,
+              color: color,
+              size: 18,
               key: ValueKey(percent >= 0.9),
             ),
           ),
           const SizedBox(width: 8),
-          Expanded(child: Text(hint,
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: color))),
+          Expanded(
+              child: Text(hint,
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: color))),
           // Animated percentage counter
           TweenAnimationBuilder<double>(
             tween: Tween(begin: 0, end: percent),
@@ -471,7 +583,8 @@ class _CapacityMeter extends StatelessWidget {
             curve: Curves.easeOutCubic,
             builder: (_, v, __) => Text(
               '${(v * 100).toStringAsFixed(0)}%',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: color),
+              style: TextStyle(
+                  fontSize: 18, fontWeight: FontWeight.w800, color: color),
             ),
           ),
         ]),
@@ -503,7 +616,7 @@ class _CapacityMeter extends StatelessWidget {
                 Positioned.fill(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(6),
-                    child: _GlowPulse(color: AppColors.success),
+                    child: const _GlowPulse(color: AppColors.success),
                   ),
                 ),
             ]);
@@ -512,27 +625,36 @@ class _CapacityMeter extends StatelessWidget {
         const SizedBox(height: 8),
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text('Loaded: ${CurrencyFormatter.formatWeight(current)}',
-              style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+              style: const TextStyle(
+                  fontSize: 11, color: AppColors.textSecondary)),
           Text('Capacity: ${CurrencyFormatter.formatWeight(capacity)}',
-              style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+              style: const TextStyle(
+                  fontSize: 11, color: AppColors.textSecondary)),
         ]),
         // 90% marker tick
         const SizedBox(height: 8),
         Stack(children: [
-          Container(height: 2,
-              decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(2))),
+          Container(
+              height: 2,
+              decoration: BoxDecoration(
+                  color: AppColors.divider,
+                  borderRadius: BorderRadius.circular(2))),
           FractionallySizedBox(
             widthFactor: 0.9,
-            child: Container(height: 2, color: Colors.transparent,
+            child: Container(
+              height: 2,
+              color: Colors.transparent,
               alignment: Alignment.centerRight,
-              child: Container(width: 2, height: 12, color: AppColors.textMuted),
+              child:
+                  Container(width: 2, height: 12, color: AppColors.textMuted),
             ),
           ),
         ]),
         const SizedBox(height: 2),
         const Align(
           alignment: Alignment(0.8, 0),
-          child: Text('90% min', style: TextStyle(fontSize: 9, color: AppColors.textMuted)),
+          child: Text('90% min',
+              style: TextStyle(fontSize: 9, color: AppColors.textMuted)),
         ),
       ]),
     );
@@ -563,7 +685,10 @@ class _GlowPulseState extends State<_GlowPulse>
   }
 
   @override
-  void dispose() { _ctrl.dispose(); super.dispose(); }
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -594,15 +719,18 @@ class _BottomActionBar extends StatelessWidget {
   final VoidCallback onCreateTap;
 
   const _BottomActionBar({
-    required this.selectedCount, required this.totalWeight,
-    required this.canCreate, required this.capacityPercent,
+    required this.selectedCount,
+    required this.totalWeight,
+    required this.canCreate,
+    required this.capacityPercent,
     required this.onCreateTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(16, 12, 16, MediaQuery.of(context).padding.bottom + 12),
+      padding: EdgeInsets.fromLTRB(
+          16, 12, 16, MediaQuery.of(context).padding.bottom + 12),
       decoration: const BoxDecoration(
         color: AppColors.cardBg,
         border: Border(top: BorderSide(color: AppColors.divider)),
@@ -611,9 +739,12 @@ class _BottomActionBar extends StatelessWidget {
         // Summary row
         if (selectedCount > 0) ...[
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            _summaryChip(Icons.receipt_long_outlined, '$selectedCount bilties selected'),
-            _summaryChip(Icons.scale_outlined, CurrencyFormatter.formatWeight(totalWeight)),
-            _summaryChip(Icons.percent_rounded, '${(capacityPercent * 100).toStringAsFixed(0)}% filled'),
+            _summaryChip(
+                Icons.receipt_long_outlined, '$selectedCount bilties selected'),
+            _summaryChip(Icons.scale_outlined,
+                CurrencyFormatter.formatWeight(totalWeight)),
+            _summaryChip(Icons.percent_rounded,
+                '${(capacityPercent * 100).toStringAsFixed(0)}% filled'),
           ]),
           const SizedBox(height: 10),
         ],
@@ -622,11 +753,16 @@ class _BottomActionBar extends StatelessWidget {
           child: ElevatedButton.icon(
             onPressed: onCreateTap,
             style: ElevatedButton.styleFrom(
-              backgroundColor: canCreate ? AppColors.success : AppColors.textMuted,
+              backgroundColor:
+                  canCreate ? AppColors.success : AppColors.textMuted,
               disabledBackgroundColor: AppColors.textMuted,
             ),
-            icon: Icon(canCreate ? Icons.check_circle_outline : Icons.lock_outline, size: 18),
-            label: Text(canCreate ? 'Create Challan' : 'Cannot Create — 90% Rule Not Met'),
+            icon: Icon(
+                canCreate ? Icons.check_circle_outline : Icons.lock_outline,
+                size: 18),
+            label: Text(canCreate
+                ? 'Create Challan'
+                : 'Cannot Create — 90% Rule Not Met'),
           ),
         ),
       ]),
@@ -634,8 +770,12 @@ class _BottomActionBar extends StatelessWidget {
   }
 
   Widget _summaryChip(IconData icon, String label) => Row(children: [
-    Icon(icon, size: 13, color: AppColors.textSecondary),
-    const SizedBox(width: 4),
-    Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
-  ]);
+        Icon(icon, size: 13, color: AppColors.textSecondary),
+        const SizedBox(width: 4),
+        Text(label,
+            style: const TextStyle(
+                fontSize: 11,
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w500)),
+      ]);
 }

@@ -9,8 +9,6 @@ import '../../../providers/bilty_provider.dart';
 import '../../../providers/challan_provider.dart';
 import '../../../providers/master_data_provider.dart';
 import '../../../providers/trip_management_provider.dart';
-import '../../../core/widgets/empty_state.dart';
-import '../../../core/widgets/shimmer_loader.dart';
 import '../../bilty_new/view/new_bilty_screen.dart';
 import '../../challan/view/new_challan_screen.dart';
 import '../../master_data/view/master_data_screen.dart';
@@ -21,16 +19,16 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth    = context.watch<AuthProvider>();
-    final biltyP  = context.watch<BiltyProvider>();
+    final auth = context.watch<AuthProvider>();
+    final biltyP = context.watch<BiltyProvider>();
     context.watch<ChallanProvider>();
-    final tripP   = context.watch<TripManagementProvider>();
+    final tripP = context.watch<TripManagementProvider>();
     final masterP = context.watch<MasterDataProvider>();
 
-    final totalBilties   = biltyP.bilties.length;
+    final totalBilties = biltyP.bilties.length;
     final pendingBilties = biltyP.pendingBilties.length;
-    final activeTrips    = tripP.activeTrips.length;
-    final availTrucks    = masterP.availableTrucks.length;
+    final activeTrips = tripP.activeTrips.length;
+    final availTrucks = masterP.availableTrucks.length;
 
     return Scaffold(
       backgroundColor: AppColors.surface,
@@ -45,10 +43,10 @@ class DashboardScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
               children: [
                 _SummaryGrid(
-                  totalBilties:   totalBilties,
+                  totalBilties: totalBilties,
                   pendingBilties: pendingBilties,
-                  activeTrips:    activeTrips,
-                  availTrucks:    availTrucks,
+                  activeTrips: activeTrips,
+                  availTrucks: availTrucks,
                 ),
                 const SizedBox(height: 24),
                 _QuickActions(),
@@ -81,7 +79,7 @@ class _DashboardHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final firstName = userName.split(' ').first;
-    final greeting  = _greeting();
+    final greeting = _greeting();
 
     return Container(
       width: double.infinity,
@@ -93,7 +91,6 @@ class _DashboardHeader extends StatelessWidget {
         ),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
         // ── Row 1: Avatar + greeting  |  Logout right ──────────────────
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 12, 0),
@@ -102,15 +99,20 @@ class _DashboardHeader extends StatelessWidget {
             children: [
               // Avatar circle with user initial
               Container(
-                width: 48, height: 48,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
-                    colors: [Colors.white.withValues(alpha: 0.25), Colors.white.withValues(alpha: 0.10)],
+                    colors: [
+                      Colors.white.withValues(alpha: 0.25),
+                      Colors.white.withValues(alpha: 0.10)
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.35), width: 1.5),
+                  border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.35), width: 1.5),
                 ),
                 child: Center(
                   child: Text(
@@ -154,7 +156,8 @@ class _DashboardHeader extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.logout_rounded, color: Colors.white, size: 18),
+                  child: const Icon(Icons.logout_rounded,
+                      color: Colors.white, size: 18),
                 ),
               ),
             ],
@@ -172,15 +175,21 @@ class _DashboardHeader extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.dashboard_rounded, color: Colors.white, size: 18),
+                child: const Icon(Icons.dashboard_rounded,
+                    color: Colors.white, size: 18),
               ),
               const SizedBox(width: 10),
-              const Text('Operations Dashboard',
+              const Expanded(
+                child: Text(
+                  'Operations Dashboard',
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: -0.5)),
+                      letterSpacing: -0.5),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
         ),
@@ -195,9 +204,13 @@ class _DashboardHeader extends StatelessWidget {
         title: const Text('Sign out'),
         content: const Text('Are you sure you want to sign out?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
           ElevatedButton(
-            onPressed: () { Navigator.pop(ctx); ctx.read<AuthProvider>().logout(); },
+            onPressed: () {
+              Navigator.pop(ctx);
+              ctx.read<AuthProvider>().logout();
+            },
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
             child: const Text('Sign out'),
           ),
@@ -212,54 +225,62 @@ class _DashboardHeader extends StatelessWidget {
 class _SummaryGrid extends StatelessWidget {
   final int totalBilties, pendingBilties, activeTrips, availTrucks;
   const _SummaryGrid({
-    required this.totalBilties, required this.pendingBilties,
-    required this.activeTrips,  required this.availTrucks,
+    required this.totalBilties,
+    required this.pendingBilties,
+    required this.activeTrips,
+    required this.availTrucks,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(children: [
       Row(children: [
-        Expanded(child: _StatCard(
-          label:      'Total Bilties',
-          value:      '$totalBilties',
-          icon:       Icons.receipt_long_rounded,
+        Expanded(
+            child: _StatCard(
+          label: 'Total Bilties',
+          value: '$totalBilties',
+          icon: Icons.receipt_long_rounded,
           gradColors: AppColors.gradBlue,
-          ringValue:  totalBilties > 0 ? pendingBilties / totalBilties : 0,
-          ringColor:  AppColors.accent,
-          onTap: () => _push(context, const _BiltyListPage(filterPending: false)),
+          ringValue: totalBilties > 0 ? pendingBilties / totalBilties : 0,
+          ringColor: AppColors.accent,
+          onTap: () =>
+              _push(context, const _BiltyListPage(filterPending: false)),
         )),
         const SizedBox(width: 12),
-        Expanded(child: _StatCard(
-          label:      'Pending',
-          value:      '$pendingBilties',
-          icon:       Icons.pending_actions_rounded,
+        Expanded(
+            child: _StatCard(
+          label: 'Pending',
+          value: '$pendingBilties',
+          icon: Icons.pending_actions_rounded,
           gradColors: AppColors.gradBlue,
-          badge:      pendingBilties > 0 ? '$pendingBilties' : null,
-          ringValue:  totalBilties > 0 ? pendingBilties / totalBilties : 0,
-          ringColor:  AppColors.accent,
-          onTap: () => _push(context, const _BiltyListPage(filterPending: true)),
+          badge: pendingBilties > 0 ? '$pendingBilties' : null,
+          ringValue: totalBilties > 0 ? pendingBilties / totalBilties : 0,
+          ringColor: AppColors.accent,
+          onTap: () =>
+              _push(context, const _BiltyListPage(filterPending: true)),
         )),
       ]),
       const SizedBox(height: 12),
       Row(children: [
-        Expanded(child: _StatCard(
-          label:      'Active Trips',
-          value:      '$activeTrips',
-          icon:       Icons.local_shipping_rounded,
+        Expanded(
+            child: _StatCard(
+          label: 'Active Trips',
+          value: '$activeTrips',
+          icon: Icons.local_shipping_rounded,
           gradColors: AppColors.gradBlue,
-          ringValue:  activeTrips > 0 ? (activeTrips / 5).clamp(0.05, 1.0) : 0,
-          ringColor:  AppColors.accent,
+          ringValue: activeTrips > 0 ? (activeTrips / 5).clamp(0.05, 1.0) : 0,
+          ringColor: AppColors.accent,
           onTap: () => _push(context, const TripManagementScreen()),
         )),
         const SizedBox(width: 12),
-        Expanded(child: _StatCard(
-          label:      'Avail. Trucks',
-          value:      '$availTrucks',
-          icon:       Icons.fire_truck_rounded,
+        Expanded(
+            child: _StatCard(
+          label: 'Avail. Trucks',
+          value: '$availTrucks',
+          icon: Icons.fire_truck_rounded,
           gradColors: AppColors.gradBlue,
-          ringValue:  availTrucks > 0 ? (availTrucks / 4).clamp(0.05, 1.0) : 0,
-          ringColor:  AppColors.accent,
+          ringValue: availTrucks > 0 ? (availTrucks / 4).clamp(0.05, 1.0) : 0,
+          ringColor: AppColors.accent,
           onTap: () => _push(context, const MasterDataScreen()),
         )),
       ]),
@@ -280,9 +301,14 @@ class _StatCard extends StatelessWidget {
   final Color ringColor;
 
   const _StatCard({
-    required this.label, required this.value, required this.icon,
-    required this.gradColors, required this.onTap, this.badge,
-    this.ringValue = 0, this.ringColor = Colors.white,
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.gradColors,
+    required this.onTap,
+    this.badge,
+    this.ringValue = 0,
+    this.ringColor = Colors.white,
   });
 
   @override
@@ -310,13 +336,15 @@ class _StatCard extends StatelessWidget {
         child: Stack(children: [
           // ── Animated progress ring using CustomPainter ──────────────────
           Positioned(
-            right: -8, top: -8,
+            right: -8,
+            top: -8,
             child: TweenAnimationBuilder<double>(
               tween: Tween(begin: 0.0, end: ringValue.clamp(0.0, 1.0)),
               duration: const Duration(milliseconds: 900),
               curve: Curves.easeOutCubic,
               builder: (_, v, __) => SizedBox(
-                width: 72, height: 72,
+                width: 72,
+                height: 72,
                 child: CustomPaint(
                   painter: _RingPainter(progress: v, color: ringColor),
                 ),
@@ -329,7 +357,8 @@ class _StatCard extends StatelessWidget {
             children: [
               // ── Material icon ──────────────────────────────────────────────
               Container(
-                width: 40, height: 40,
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.22),
                   borderRadius: BorderRadius.circular(10),
@@ -349,14 +378,18 @@ class _StatCard extends StatelessWidget {
                         height: 1,
                       )),
                   const SizedBox(width: 6),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Text(label,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.85),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                        )),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Text(label,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.85),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1),
+                    ),
                   ),
                 ],
               ),
@@ -365,7 +398,8 @@ class _StatCard extends StatelessWidget {
           // Badge
           if (badge != null)
             Positioned(
-              top: 0, right: 0,
+              top: 0,
+              right: 0,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
@@ -374,7 +408,8 @@ class _StatCard extends StatelessWidget {
                 ),
                 child: Text(badge!,
                     style: TextStyle(
-                        fontSize: 10, fontWeight: FontWeight.w800,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
                         color: gradColors.last)),
               ),
             ),
@@ -392,51 +427,61 @@ class _QuickActions extends StatelessWidget {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       const _SectionTitle('Quick Actions'),
       const SizedBox(height: 12),
-      Row(children: [
-        Expanded(child: _ActionTile(
-          icon: Icons.receipt_long_rounded,
-          label: 'New Bilty',
-          iconColor: AppColors.info,
-          bgColor: AppColors.infoLight,
-          onTap: () async {
-            await Navigator.push(context, MaterialPageRoute(builder: (_) => const NewBiltyScreen()));
-            if (context.mounted) _refreshAll(context);
-          },
-        )),
-        const SizedBox(width: 10),
-        Expanded(child: _ActionTile(
-          icon: Icons.description_rounded,
-          label: 'New Challan',
-          iconColor: AppColors.warning,
-          bgColor: AppColors.warningLight,
-          onTap: () async {
-            await Navigator.push(context, MaterialPageRoute(builder: (_) => const NewChallanScreen()));
-            if (context.mounted) _refreshAll(context);
-          },
-        )),
-        const SizedBox(width: 10),
-        Expanded(child: _ActionTile(
-          icon: Icons.local_shipping_rounded,
-          label: 'New Trip',
-          iconColor: AppColors.success,
-          bgColor: AppColors.successLight,
-          onTap: () async {
-            await Navigator.push(context, MaterialPageRoute(builder: (_) => const NewTripScreen()));
-            if (context.mounted) _refreshAll(context);
-          },
-        )),
-        const SizedBox(width: 10),
-        Expanded(child: _ActionTile(
-          icon: Icons.dataset_rounded,
-          label: 'Master Data',
-          iconColor: AppColors.primary,
-          bgColor: AppColors.surface,
-          onTap: () async {
-            await Navigator.push(context, MaterialPageRoute(builder: (_) => const MasterDataScreen()));
-            if (context.mounted) _refreshAll(context);
-          },
-        )),
-      ]),
+      IntrinsicHeight(
+        child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Expanded(
+              child: _ActionTile(
+            icon: Icons.receipt_long_rounded,
+            label: 'New Bilty',
+            iconColor: AppColors.info,
+            bgColor: AppColors.infoLight,
+            onTap: () async {
+              await Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const NewBiltyScreen()));
+              if (context.mounted) _refreshAll(context);
+            },
+          )),
+          const SizedBox(width: 10),
+          Expanded(
+              child: _ActionTile(
+            icon: Icons.description_rounded,
+            label: 'New Challan',
+            iconColor: AppColors.warning,
+            bgColor: AppColors.warningLight,
+            onTap: () async {
+              await Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const NewChallanScreen()));
+              if (context.mounted) _refreshAll(context);
+            },
+          )),
+          const SizedBox(width: 10),
+          Expanded(
+              child: _ActionTile(
+            icon: Icons.local_shipping_rounded,
+            label: 'New Trip',
+            iconColor: AppColors.success,
+            bgColor: AppColors.successLight,
+            onTap: () async {
+              await Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const NewTripScreen()));
+              if (context.mounted) _refreshAll(context);
+            },
+          )),
+          const SizedBox(width: 10),
+          Expanded(
+              child: _ActionTile(
+            icon: Icons.dataset_rounded,
+            label: 'Master Data',
+            iconColor: AppColors.primary,
+            bgColor: AppColors.surface,
+            onTap: () async {
+              await Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const MasterDataScreen()));
+              if (context.mounted) _refreshAll(context);
+            },
+          )),
+        ]),
+      ),
     ]);
   }
 
@@ -455,8 +500,11 @@ class _ActionTile extends StatelessWidget {
   final Color bgColor;
   final VoidCallback onTap;
   const _ActionTile({
-    required this.icon, required this.label,
-    required this.iconColor, required this.bgColor, required this.onTap,
+    required this.icon,
+    required this.label,
+    required this.iconColor,
+    required this.bgColor,
+    required this.onTap,
   });
 
   @override
@@ -479,7 +527,8 @@ class _ActionTile extends StatelessWidget {
         child: Column(children: [
           // ── Material icon — uniform size for all quick actions
           Container(
-            width: 48, height: 48,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
               color: bgColor,
               borderRadius: BorderRadius.circular(12),
@@ -489,7 +538,8 @@ class _ActionTile extends StatelessWidget {
           const SizedBox(height: 7),
           Text(label,
               style: const TextStyle(
-                  fontSize: 10, fontWeight: FontWeight.w600,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
                   color: AppColors.textSecondary),
               textAlign: TextAlign.center),
         ]),
@@ -529,14 +579,16 @@ class _ActiveTripRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vm     = context.read<TripManagementProvider>();
-    final route  = vm.routeForTrip(trip);
-    final truck  = vm.truckForTrip(trip);
-    final state  = TripStateHelper.label(trip.state);
+    final vm = context.read<TripManagementProvider>();
+    final route = vm.routeForTrip(trip);
+    final truck = vm.truckForTrip(trip);
+    final state = TripStateHelper.label(trip.state);
 
-    final stateColor = trip.state == TripState.inTransit  ? AppColors.info
-        : trip.state == TripState.dispatched              ? AppColors.warning
-        : AppColors.success;
+    final stateColor = trip.state == TripState.inTransit
+        ? AppColors.info
+        : trip.state == TripState.dispatched
+            ? AppColors.warning
+            : AppColors.success;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -558,12 +610,18 @@ class _ActiveTripRow extends StatelessWidget {
           child: Image.asset('assets/delivery.png', fit: BoxFit.contain),
         ),
         const SizedBox(width: 12),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(trip.tripNo,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.primary)),
+              style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary)),
           const SizedBox(height: 2),
           Text(route?.displayName ?? '—',
-              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+              style: const TextStyle(
+                  fontSize: 12, color: AppColors.textSecondary)),
           const SizedBox(height: 2),
           Text(truck?.vehicleNo ?? '—',
               style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
@@ -574,7 +632,10 @@ class _ActiveTripRow extends StatelessWidget {
               color: stateColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(20)),
           child: Text(state,
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: stateColor)),
+              style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: stateColor)),
         ),
       ]),
     );
@@ -595,8 +656,10 @@ class _RecentBiltiesSection extends StatelessWidget {
         const _SectionTitle('Recent Bilties'),
         const Spacer(),
         TextButton(
-          onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const _BiltyListPage(filterPending: false))),
+          onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const _BiltyListPage(filterPending: false))),
           child: const Text('View all', style: TextStyle(fontSize: 12)),
         ),
       ]),
@@ -612,7 +675,7 @@ class _BiltyRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isPending   = bilty.isPending;
+    final isPending = bilty.isPending;
     final statusColor = isPending ? AppColors.warning : AppColors.success;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -624,7 +687,8 @@ class _BiltyRow extends StatelessWidget {
       ),
       child: Row(children: [
         Container(
-          width: 38, height: 38,
+          width: 38,
+          height: 38,
           decoration: BoxDecoration(
               color: statusColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10)),
@@ -632,16 +696,25 @@ class _BiltyRow extends StatelessWidget {
           child: Image.asset('assets/bill.png', fit: BoxFit.contain),
         ),
         const SizedBox(width: 10),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(bilty.biltyNo,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary)),
+              style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary)),
           Text('${bilty.consignorName} → ${bilty.consigneeCity}',
-              style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+              style:
+                  const TextStyle(fontSize: 11, color: AppColors.textSecondary),
               overflow: TextOverflow.ellipsis),
         ])),
         Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Text(CurrencyFormatter.format(bilty.totalFreight),
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+              style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary)),
           const SizedBox(height: 3),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -650,7 +723,8 @@ class _BiltyRow extends StatelessWidget {
                 borderRadius: BorderRadius.circular(4)),
             child: Text(
               isPending ? 'Pending' : BiltyStatusHelper.label(bilty.status),
-              style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: statusColor),
+              style: TextStyle(
+                  fontSize: 9, fontWeight: FontWeight.w700, color: statusColor),
             ),
           ),
         ]),
@@ -668,7 +742,7 @@ class _BiltyListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final biltyP = context.watch<BiltyProvider>();
-    final list   = filterPending ? biltyP.pendingBilties : biltyP.bilties;
+    final list = filterPending ? biltyP.pendingBilties : biltyP.bilties;
 
     return Scaffold(
       backgroundColor: AppColors.surface,
@@ -686,16 +760,21 @@ class _BiltyListPage extends StatelessWidget {
         ],
       ),
       body: list.isEmpty
-          ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+          ? Center(
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
               Container(
-                width: 80, height: 80,
-                decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20)),
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(20)),
                 padding: const EdgeInsets.all(16),
                 child: Image.asset('assets/bill.png', fit: BoxFit.contain),
               ),
               const SizedBox(height: 16),
               Text(filterPending ? 'No pending bilties' : 'No bilties yet',
-                  style: const TextStyle(color: AppColors.textMuted, fontSize: 15)),
+                  style: const TextStyle(
+                      color: AppColors.textMuted, fontSize: 15)),
             ]))
           : ListView.builder(
               padding: const EdgeInsets.all(16),
@@ -724,7 +803,10 @@ class _DetailedBiltyCard extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Text(bilty.biltyNo,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.primary)),
+              style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary)),
           const Spacer(),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -732,15 +814,18 @@ class _DetailedBiltyCard extends StatelessWidget {
                 color: statusColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(20)),
             child: Text(BiltyStatusHelper.label(bilty.status),
-                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: statusColor)),
+                style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: statusColor)),
           ),
         ]),
         const SizedBox(height: 6),
         const Divider(height: 1),
         const SizedBox(height: 8),
-        _row('From',    bilty.consignorName),
-        _row('To',      '${bilty.consigneeName}, ${bilty.consigneeCity}'),
-        _row('Weight',  CurrencyFormatter.formatWeight(bilty.weightKg)),
+        _row('From', bilty.consignorName),
+        _row('To', '${bilty.consigneeName}, ${bilty.consigneeCity}'),
+        _row('Weight', CurrencyFormatter.formatWeight(bilty.weightKg)),
         _row('Freight', CurrencyFormatter.format(bilty.totalFreight)),
         _row('Payment', PaymentTypeHelper.label(bilty.paymentType)),
       ]),
@@ -748,15 +833,22 @@ class _DetailedBiltyCard extends StatelessWidget {
   }
 
   Widget _row(String l, String v) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 3),
-    child: Row(children: [
-      SizedBox(width: 68,
-          child: Text(l, style: const TextStyle(fontSize: 12, color: AppColors.textMuted))),
-      Expanded(child: Text(v,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
-          overflow: TextOverflow.ellipsis)),
-    ]),
-  );
+        padding: const EdgeInsets.symmetric(vertical: 3),
+        child: Row(children: [
+          SizedBox(
+              width: 68,
+              child: Text(l,
+                  style: const TextStyle(
+                      fontSize: 12, color: AppColors.textMuted))),
+          Expanded(
+              child: Text(v,
+                  style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textPrimary),
+                  overflow: TextOverflow.ellipsis)),
+        ]),
+      );
 }
 
 // ── Shared helpers ────────────────────────────────────────────────────────────
@@ -768,8 +860,11 @@ class _SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(text,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary, letterSpacing: -0.3));
+        style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+            letterSpacing: -0.3));
   }
 }
 
@@ -777,22 +872,23 @@ class _SectionTitle extends StatelessWidget {
 /// Draws a thin arc progress ring. Used on dashboard stat cards.
 class _RingPainter extends CustomPainter {
   final double progress; // 0.0 → 1.0
-  final Color  color;
+  final Color color;
   const _RingPainter({required this.progress, required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final cx = size.width  / 2;
+    final cx = size.width / 2;
     final cy = size.height / 2;
     final radius = (size.width / 2) - 6;
 
     // Track (background arc)
     canvas.drawCircle(
-      Offset(cx, cy), radius,
+      Offset(cx, cy),
+      radius,
       Paint()
-        ..style       = PaintingStyle.stroke
+        ..style = PaintingStyle.stroke
         ..strokeWidth = 5
-        ..color       = color.withValues(alpha: 0.15),
+        ..color = color.withValues(alpha: 0.15),
     );
 
     // Progress arc
@@ -803,10 +899,10 @@ class _RingPainter extends CustomPainter {
         progress * 6.2832, // sweep (progress × 2π)
         false,
         Paint()
-          ..style       = PaintingStyle.stroke
+          ..style = PaintingStyle.stroke
           ..strokeWidth = 5
-          ..strokeCap   = StrokeCap.round
-          ..color       = color.withValues(alpha: 0.65),
+          ..strokeCap = StrokeCap.round
+          ..color = color.withValues(alpha: 0.65),
       );
     }
   }

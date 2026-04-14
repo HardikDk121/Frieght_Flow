@@ -33,7 +33,7 @@ class FreightFlowApp extends StatelessWidget {
         theme: AppTheme.light,
         debugShowCheckedModeBanner: false,
         // ── Splash screen is the entry point ─────────────────────────────
-        home: SplashScreen(nextScreen: const _AuthGate()),
+        home: const SplashScreen(nextScreen: _AuthGate()),
         onGenerateRoute: _generateRoute,
       ),
     );
@@ -42,12 +42,23 @@ class FreightFlowApp extends StatelessWidget {
   static Route<dynamic>? _generateRoute(RouteSettings settings) {
     Widget page;
     switch (settings.name) {
-      case '/bilty-new':  page = const NewBiltyScreen();    break;
-      case '/challan':    page = const NewChallanScreen();  break;
-      case '/trip-new':   page = const NewTripScreen();     break;
-      case '/master':     page = const MasterDataScreen();  break;
-      case '/profile':    page = const ProfileScreen();     break;
-      default:            page = const _AuthGate();
+      case '/bilty-new':
+        page = const NewBiltyScreen();
+        break;
+      case '/challan':
+        page = const NewChallanScreen();
+        break;
+      case '/trip-new':
+        page = const NewTripScreen();
+        break;
+      case '/master':
+        page = const MasterDataScreen();
+        break;
+      case '/profile':
+        page = const ProfileScreen();
+        break;
+      default:
+        page = const _AuthGate();
     }
     return MaterialPageRoute(builder: (_) => page, settings: settings);
   }

@@ -416,7 +416,7 @@ void _showAddTruckDialog(BuildContext context) {
           key: formKey,
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             _dialogField(vehicleCtrl, 'Vehicle Number *', hint: 'GJ-03-XX-0000',
-                formatters: [FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9\-]')), LengthLimitingTextInputFormatter(12)],
+                formatters: [FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9\-]')), LengthLimitingTextInputFormatter(13)], // Allows GJ-03-XX-0000
                 validator: AppValidators.vehicleNumber),
             const SizedBox(height: 12),
             _dialogField(makeCtrl, 'Make *', hint: 'Tata, Ashok Leyland…',

@@ -63,15 +63,15 @@ class _AuthScreenState extends State<AuthScreen>
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 // Real FreightFlow logo — white background matches the logo card
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(24),
                     boxShadow: [
-                      BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 12, offset: const Offset(0, 4)),
+                      BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 20, offset: const Offset(0, 8)),
                     ],
                   ),
-                  child: Image.asset('assets/logo.png', height: 56, fit: BoxFit.contain),
+                  child: Image.asset('assets/logo.png', height: 72, fit: BoxFit.contain),
                 ),
                 const SizedBox(height: 20),
                 const Text('FreightFlow',
@@ -101,6 +101,7 @@ class _AuthScreenState extends State<AuthScreen>
                       decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(12)),
                       child: TabBar(
                         controller: _tabs,
+                        onTap: (index) => setState(() {}),
                         indicator: BoxDecoration(
                           color: AppColors.cardBg,
                           borderRadius: BorderRadius.circular(10),
@@ -115,12 +116,10 @@ class _AuthScreenState extends State<AuthScreen>
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 400,
-                    child: TabBarView(
-                      controller: _tabs,
-                      children: [_loginForm(), _registerForm()],
-                    ),
+                  // AnimatedSwitcher to naturally resize based on the active tab form
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: _tabs.index == 0 ? _loginForm() : _registerForm(),
                   ),
                 ]),
               ),
@@ -153,7 +152,7 @@ class _AuthScreenState extends State<AuthScreen>
             ),
             const SizedBox(height: 8),
             if (auth.status == AuthStatus.error) _errorBanner(auth.error ?? 'Login failed'),
-            const Spacer(),
+            const SizedBox(height: 24),
             SizedBox(width: double.infinity, child: ElevatedButton(
               onPressed: auth.isLoading ? null : _doLogin,
               child: auth.isLoading
@@ -164,11 +163,13 @@ class _AuthScreenState extends State<AuthScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(color: AppColors.infoLight, borderRadius: BorderRadius.circular(8)),
-              child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              child: const Row(children: [
                 Icon(Icons.info_outline, size: 14, color: AppColors.info),
-                SizedBox(width: 6),
-                Text('Demo: admin@freightflow.in / admin123',
-                    style: TextStyle(fontSize: 11, color: AppColors.info)),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text('Demo: admin@freightflow.in / admin123',
+                      style: TextStyle(fontSize: 12, color: AppColors.info)),
+                ),
               ]),
             ),
           ]),
@@ -202,7 +203,7 @@ class _AuthScreenState extends State<AuthScreen>
                 obscure: true,
                 validator: (v) => v != _regPassCtrl.text ? 'Passwords do not match' : null),
             if (auth.status == AuthStatus.error) ...[const SizedBox(height: 8), _errorBanner(auth.error ?? 'Failed')],
-            const Spacer(),
+            const SizedBox(height: 24),
             SizedBox(width: double.infinity, child: ElevatedButton(
               onPressed: auth.isLoading ? null : _doRegister,
               child: auth.isLoading
